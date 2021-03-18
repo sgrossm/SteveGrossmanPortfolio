@@ -1,0 +1,210 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title> Game Audio! </title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="icon" href="images/icon.png">
+	</head>
+	<body class="is-preload">
+
+			<section id="header">
+				<header>
+					<h1 id="logo"><a href="index.html" class="fas fa-arrow-circle-left"> Steve Grossman</a></h1>
+				</header>
+				<nav id="nav">
+					<ul>
+						<li><a href="#one" class="active">Audio Implementation</a></li>
+						<li><a href="#two">Sound Design</a></li>
+						<li><a href="#three">Composition</a></li
+						
+					</ul>
+				</nav>
+				<footer>
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/stevengrossman821/" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+						<li><a href="https://www.instagram.com/steviegrossman/" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+						<li><a href="https://www.youtube.com/channel/UC__D6CFUUO5ZA1of-vdP1iA" class="icon brands fa-youtube"><span class="label">Youtube</span></a></li>						
+						<li><a href="mailto:stevegrossman821@gmail" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+					</ul>
+				</footer>
+			</section>
+
+			<div id="wrapper">
+							<section id="one">
+								<div class="container">
+									<h3>Audio Implementation</h3>
+									<div class="features">
+										<article>
+											<div>
+												<h4>Unity Integration</h4>
+												<p> 
+													In the past I've used Wwise for audio integration and got a certification from their awesome online training.
+													For this project, I decided to delve into FMOD.  
+													All music and sound effects were created, mixed, and implemented by me using FL Studio, FMOD and Unity.
+													I used the <u><a href="https://learn.unity.com/project/3d-game-kit-lite">3D Gamekit Lite Unity project </a> </u> 
+													for simple level design and gameplay. 
+													
+													
+													Here is a video showing the final product.<br/>
+<iframe width="760" height="515" src="https://www.youtube.com/embed/3yfeIKmOirs" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> <br/>
+													<br/>
+													The first step was to strip all the Unity audio out of the project and start hooking up events I created in FMOD.
+													
+													Coming from a traditional music composition background, interactive music provided an interesting challenge for me.
+													FMOD contains different "instrument" types in order to trigger sound in a dynamic way.
+													The most common types are single and multi instruments. Single instruments are just single audio clips.
+													Multi instruments allow for multiple audio files to be selected based on some prioritization or randomly each time an event
+													triggers. This adds variety and immersion to the game world. 
+													
+													Events can be 2D or 3D. Background music does not need to include spatialization (or positional information)
+													and can play as a 2D timeline event. 
+													
+													Music should change based on context: if the player engages in combat, enters a new area, or pauses the game,
+													the music should transition to a new state.
+													
+													In order to change the background music when releveant, I created trigger zones in Unity and attached 
+													Studio Parameter Trigger to them. When the player enters those areas, this component updates the FMOD parameter
+													to transition to a different track. 
+													
+													This transition is specified by quantization options that allow for 
+													immediate transitions or to wait a certain number of beats to transition. This keeps things in tempo and won't 
+													disrupt the flow of music for the listener.  
+													<img  src="images/GameAudio/Quantization.png" style="display:block;width:80%;"/>
+													
+													<br/>Certain transitions, such as combat, should be more immediate.
+													Within each of these songs, I created loop regions with destination markers set to percentages. This indicates
+													that some percentage of the time the song will transition to the destination, and other times it will loop. 
+													<img src="images/GameAudio/MusicFMOD.png" style="display:block;width:100%;"/>
+													
+													One of the global parameters I created for music was the GamePaused parameter. When the player pauses the game,
+													I apply a bandpass filter to the mix, creating a muffled sound that indicates gameplay in the background. 
+													<img src="images/GameAudio/GamePaused.png" style="display:block;width:80%;"/>
+													
+													Ambient sound, such as wind, bubbling acid, and city sounds definitely needed 3D directional data. These
+													are fairly easy to set up without code and only trigger when the player is within a certain distance of the emmiter object. 
+												
+													SFX are mainly triggered on a OneShot basis (fire-and-forget) and need to be positioned in such a way that the sound 
+													is coming from the right location. For example, if the player swings their staff, the event needs to be passed along 
+													with the staff game object. 
+													<img src="images/GameAudio/OneShotGameObject.png" style="display:block;width:80%;"/>
+													
+													
+													The main instrument types I used for SFX were multi instruments. Setting them to random or shuffle playback gives you the
+													ability to control the percentage probability of a particular clip being selected for playback. Scatterer instruments are 
+													useful as well if you have a larger number of sounds that need to trigger and overlap each other such as during item spawning.
+												</p>
+												<h4> Mixer </h4>
+												<p>
+													Finally, events can be routed into mixer groups in order to apply batch processing to similar events.
+													These mixers allow you to control volume and other effects, one of the most logical uses being that you 
+													can route them into your option menu in order to allow players to set volumes for music and SFX, as well as
+													a global volume that will reference the master bus. One of the interesting things I was able to do as well 
+													is to use a sidechain compressor in order to duck the volume of the music when important SFX triggered. Sidechaining 
+													allowed me to compress (lower the volume of) the music based on the input of an external signal. 
+													<img src="images/GameAudio/Sidechain.png" style="display:block;width:80%;"/>
+
+												</p>
+												
+												
+													
+												<h4> Max instances, Priority, Optimization, and Profiling </h4>
+												<p>
+													After getting sound to play in the game we can monitor and tweak certain settings to improve performance and remove
+													any unnecessary burdens from the CPU. One of the best ways to determine if there are any spikes during processing is to 
+													use the FMOD profiler and connect it to your game using Live Update. Then you can record a session and look for any spikes.
+													<img src="images/GameAudio/Profiler.png" style="display:block;width:80%;"/>
+
+													Some other areas we can look at are located in the Event Macros Drawer. This view provides options for how events are created,
+													how many instances of an event can exist concurrently, and how they behave if they go over the max instance count.
+													
+													The most important of these options are the number of Max Instances, Stealing Mode, and Priority. 
+													The stealing mode is very interesting because it specifies how an event will be stopped or virtualized when 
+													it exceeds the max instance count. I often chose to Furthest(which stops the instance that is furthest from the listener),
+													or Virtualize (which creates the instance but produces no output).
+													<img src="images/GameAudio/macros.png" style="display:block;width:80%;"/>
+												</p>
+											</div>
+										</article>
+									</div>
+								</div>
+							</section>
+							<!-- Two -->
+							<section id="two">
+								<div class="container">
+									<h3>Sound Design</h3>
+									<div class="features">
+										<article>											
+											<div >
+												<h4> SFX Processing </h4>
+												<p> 
+<iframe width="760" height="515" src="https://www.youtube.com/embed/01pC1XcAsFU" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br/><p>
+													My process for sound design and mixing includes : <br/>1) Creating synthesized audio or finding samples <br/>
+																						   2) Layering and working on phase issues  <br/>
+																						   3) Assigning to mixer tracks and setting panning, mono/stereo, and initial volumes<br/>
+																						   4) Applying EQ, compression, distortion/saturation, and any modulation effects or delay/reverb.<br/>
+																						   5) Creating mixer busses for group processing.<br/>
+																						   6) Automating effect parameters over time <br/>
+																						   7) Referencing on multiple playback systems.<br/>
+																						   8) Loudness metering. 
+</p>											
+
+												</p>											
+												<h4> Music </h4>
+<iframe width="760" height="515" src="https://www.youtube.com/embed/PYSyDab8Esg" frameborder="0"
+ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+											</div>
+										</article>
+									</div>
+								</div>
+							</section>
+						<!-- Three -->
+							<section id="three">
+								<div class="container">
+									<h3>Composition</h3>
+									<div class="features">
+										<article>
+											<div>
+												<h4>Composer and Multi-Instrumentalist</h4>
+												<p>Check out some of my original compositions and performances.</p>
+<iframe width="760" height="515" src="https://www.youtube.com/embed/videoseries?list=PL2AmdOyMau7AgE3umC01VUuwcMeEir6vQ" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="760" height="515" src="https://www.youtube.com/embed/TCl0qTUB6jA" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="760" height="515" src="https://www.youtube.com/embed/EIIy9b6PJKY" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="760" height="515" src="https://www.youtube.com/embed/MwtiCOvgRT8" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe width="760" height="515" src="https://www.youtube.com/embed/hg-YVZcgVc0" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+<iframe width="760" height="515" src="https://www.youtube.com/embed/Wa7gyI5J42A" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+											</div>
+										</article>
+									</div>
+								</div>
+							</section>
+					</div>
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
