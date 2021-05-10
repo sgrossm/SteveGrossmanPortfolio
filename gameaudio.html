@@ -15,9 +15,9 @@
 				</header>
 				<nav id="nav">
 					<ul>
-						<li><a href="#one" class="active">Audio Implementation</a></li>
-						<li><a href="#two">Sound Design</a></li>
-						<li><a href="#three">Composition</a></li
+						<li><a href="#one" class="active">Audio Programming</a></li>
+						<li><a href="#two">Audio Implementation</a></li>
+						<li><a href="#three">Sound Design</a></li
 						
 					</ul>
 				</nav>
@@ -34,25 +34,59 @@
 			</section>
 
 			<div id="wrapper">
+							<!-- Three -->
 							<section id="one">
 								<div class="container">
-									<br/><h2>Music and Sound Design</h2>
-								
-									<div class="row gtr-uniform">
-										<div class="col-6 col-12-xsmall"><a href="https://open.spotify.com/artist/7siaSQCbWkWuBj5ZdvYjDY"> Spotify </a></div>
-										<div class="col-6 col-12-xsmall"><a href="https://soundcloud.com/puzzle-mirror/"> Soundcloud </a></div> 
-										<div class="col-6 col-12-xsmall"><a href="https://music.apple.com/us/artist/puzzle-mirror/1507882644"> Apple Music </a></div>
-										<div class="col-6 col-12-xsmall"><a href="https://puzzlemirror.bandcamp.com/"> Bandcamp </a></div>
+									<h3>Audio Programming</h3>
+									<div class="features">
+										<article>
+											<div>
+												<h4> "Synthfant" plugin written in C++ </h4>
+												<p> 
+												<button class="myButton">
+												<a href="https://github.com/sgrossm/Synthfant"> Github repo</a>
+												</button> <br/><br/>
+												
+													<a href="https://github.com/sgrossm/Synthfant">
+														<img src="images/GameAudio/Synthfant.png" style="display:block;width:80%;"/>
+													</a>
+													<h4>JUCE and C++</h4>
+													<p>Using the JUCE framework, I designed and coded a simple synthesizer plugin. 
+													
+													This project was a great learning experience, from a technical audio perspective, as well as 
+													a creative and musical perspective. I created a series of videos to document the process 
+													and illustrate some common design patterns relevant to C++ and the JUCE framework. 
+													You can view the video series on my Youtube </p>
+													<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL2AmdOyMau7Dce46vOBTbhmpErQ_tEFlv" title="YouTube video player" frameborder="0" 
+													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+													
+													
+													<br/><br/><h4>Composition Challege </h4>
+													I wanted to push Synthfant to its limit, so I decided to embark on a composition challenge,
+													using Synthfant for all my instrumentation and sound design. I came up with a theme for each day
+													and used this concept as guidance for my musical choices. This was an extremely valuable 
+													experience for me, and forced me to be creative given the constraints. You can check out each 
+													composition and walkthrough in the video playlist below:</p>
+													<iframe width="560" height="315" src="https://www.youtube.com/embed/videseries?list=PL2AmdOyMau7Acu-06Qeeg3o0RDZE5oeGZ" title="YouTube video player" frameborder="0" 
+													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+													
+													
 
+											</div>
+										</article>
 									</div>
-									<hr/>
+								</div>
+							</section>
+							<section id="two">
+								<div class="container">
 									<h3>Audio Implementation</h3>
 									<div class="features">
 										<article>
 											<div>
 												<h4>Unity Integration</h4>
 												<p> 
-													In the past I've used Wwise for audio integration and got a certification from their awesome online training.
+													In the past I've used Wwise for audio integration and got a certification from their awesome online
+													<u><a href="https://www.audiokinetic.com/learn/certifications/"> training courses </a></u>.
 													For this project, I decided to delve into FMOD.  
 													All music and sound effects were created, mixed, and implemented by me using FL Studio, FMOD and Unity.
 													I used the <u><a href="https://learn.unity.com/project/3d-game-kit-lite">3D Gamekit Lite Unity project </a> </u> 
@@ -62,7 +96,7 @@
 <iframe width="560" height="315" src="https://www.youtube.com/embed/3yfeIKmOirs" frameborder="0" 
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
 															
-													<br/><br/>
+													<br/>
 													The first step was to strip all the Unity audio out of the project and start hooking up events I created in FMOD.
 													
 													Coming from a traditional music composition background, interactive music provided an interesting challenge for me.
@@ -86,7 +120,7 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 													disrupt the flow of music for the listener.  
 													<img  src="images/GameAudio/Quantization.PNG" style="display:block;width:80%;"/>
 													
-													<br/>Certain transitions, such as combat, should be more immediate.
+													Certain transitions, such as combat, should be more immediate.
 													Within each of these songs, I created loop regions with destination markers set to percentages. This indicates
 													that some percentage of the time the song will transition to the destination, and other times it will loop. 
 													<img src="images/GameAudio/MusicFMOD.PNG" style="display:block;width:100%;"/>
@@ -95,7 +129,7 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 													I apply a bandpass filter to the mix, creating a muffled sound that indicates gameplay in the background. 
 													<img src="images/GameAudio/GamePaused.PNG" style="display:block;width:80%;"/>
 													
-													Ambient sound, such as wind, bubbling acid, and city sounds definitely needed 3D directional data. These
+													Ambient sound, such as wind, bubbling acid, and city chatter definitely needed 3D directional data. These
 													are fairly easy to set up without code and only trigger when the player is within a certain distance of the emmiter object. 
 												
 													SFX are mainly triggered on a OneShot basis (fire-and-forget) and need to be positioned in such a way that the sound 
@@ -144,67 +178,37 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 								</div>
 							</section>
 							<!-- Two -->
-							<section id="two">
+							<section id="three">
 								<div class="container">
+								<hr/>
 									<h3>Sound Design</h3>
 									<div class="features">
 										<article>											
 											<div >
-												<h4> SFX Processing </h4>
-												<p> 
+												<h4> Sound effects </h4>
+												<p> In this first video, I outline my process for sound design, as it pertains to creating game sound effects,
+												covering synthesis, sampling, layering, and processing. </p>
+															 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/01pC1XcAsFU" frameborder="0" 
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<br/><p>
-													My process for sound design and mixing includes : <br/>1) Creating synthesized audio or finding samples <br/>
-																						   2) Layering and working on phase issues  <br/>
-																						   3) Assigning to mixer tracks and setting panning, mono/stereo, and initial volumes<br/>
-																						   4) Applying EQ, compression, distortion/saturation, and any modulation effects or delay/reverb.<br/>
-																						   5) Creating mixer busses for group processing.<br/>
-																						   6) Automating effect parameters over time <br/>
-																						   7) Referencing on multiple playback systems.<br/>
-																						   8) Loudness metering. 
-</p>											
+																						
+																					
 
-												</p>											
-												<h4> Music </h4>
+												<br/><br/><h4> Mixing and Mastering </h4>
+												<p>
+												Next, I delve into the techniques used for mixing and mastering the interactive music 
+												stems I composed for the Unity demo above.
+												</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/PYSyDab8Esg" frameborder="0"
  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+											
+											
 											</div>
 										</article>
 									</div>
 								</div>
 							</section>
-						<!-- Three -->
-							<section id="three">
-								<div class="container">
-									<h3>Composition</h3>
-									<div class="features">
-										<article>
-											<div>
-												<h4>Composer and Multi-Instrumentalist</h4>
-												<p>Check out some of my original compositions and performances.</p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL2AmdOyMau7AgE3umC01VUuwcMeEir6vQ" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<hr/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/TCl0qTUB6jA" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<hr/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/EIIy9b6PJKY" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<hr/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/MwtiCOvgRT8" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<hr/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/hg-YVZcgVc0" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<hr/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Wa7gyI5J42A" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-											</div>
-										</article>
-									</div>
-								</div>
-							</section>
+							<hr/>
 					</div>
 			</div>
 
