@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title> Programming! </title>
+		<title> Programming </title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -40,24 +40,24 @@
 											<div>
 												<h4>Preliminary data structures</h4>
 												<p> The first step in designing this system is to pick a file format for your data. I chose
-													json for a number of reasons. Unity supports json serialization and can convert generic collections
-													such as Lists very easily. This means I can batch our save/load process to/from one object. The batching 
-													becomes important when we start thinking about file IO. As long
+													json for a number of reasons. Unity supports json serialization and can convert generic collections,
+													such as Lists, to/from json very easily. This means I can batch our save/load process to/from one object. The batching 
+													becomes important when we start thinking about performance and file IO. As long
 													as fields are public and our class/struct is marked with [System.Serializable], we should be able to save them.
-													(Okay, there are a few exceptions here: ScriptableObjects only serialize a reference and any nested Lists/Arrays or Dictionaries will need custom code).
+													(Okay, there are a few exceptions here: ScriptableObjects only serialize a reference and any nested Lists/Arrays or Dictionaries will need 
+													a custom serialization callback).
 													
 													Firstly, each class with data fields that need to be saved will
-													inherit a common interface, lets call it ISaveable. Each type of object will have a struct
+													inherit a common interface, lets call it ISaveable. Each object that inherits ISaveable will have a struct
 													containing the relevant data fields that need to be saved (for example: CharacterData, AudioData, InventoryData, etc). These
 													structs will similarly inherit from a common interface that will act as a tag, lets call it ISaveData.
 													ISaveable will enforce two methods: PopulateSavedata and LoadFromSaveData, and each class will use these for their specific data.
-													For our examples, I will use an example class called Character to save from and a struct called CharacterData to store fields. 
+													For our examples, I will use a fake class called Character to save from and a struct called CharacterData to store fields. 
 
 													Here is the code we need to get started. </p>
 													
 													
-<pre><code>
-ISaveable.cs
+<pre><code>ISaveable.cs
 
 public interface ISaveable { 
 	ISaveData PopulateSaveData();
@@ -65,28 +65,28 @@ public interface ISaveable {
 }
 </code></pre>
 
-<pre><code>
-ISaveData.cs
+<pre><code>ISaveData.cs
 
 public interface ISaveData {} 
 </code></pre>
 
-<pre><code>
-PlayableCharacterData.cs
+<pre><code> PlayableCharacterData.cs
 
 [Serializable]
 public struct PlayableCharacterData : ISaveData 
 {
 	public SerializableTransform SerializedTransform;
 	public float Health;
+	public int Experience;
 	// more data fields to save/load
 }
 
 public static implicit operator PlayableCharacterData(Character currentCharacter)
 {
 	PlayableCharacterData player = new PlayableCharacterData {
-		SerializedTransform = currentCharacter.transformRef,
+		SerializedTransform = currentCharacter.transform,
 		Health = currentCharacter.health
+		Experience = currentCharacter.exp;
 	};
 	
 	return player;
@@ -102,8 +102,7 @@ public static implicit operator PlayableCharacterData(Character currentCharacter
 														3) When done collecting the data, write it to the save file. <br/>
 												</p>
 
-<pre><code>
-Character.cs
+<pre><code> Character.cs
 
 public class Character : ISaveable 
 {
@@ -121,6 +120,7 @@ public class Character : ISaveable
 		var chardata = (PlayableCharacterData)loadData.=;
 		transformRef = Deserialize(chardata.SerializedTransform);
 		health = chardata.Health;
+		exp = chardata.Experience;
 		// other fields to save
 	}
 	
@@ -130,11 +130,10 @@ public class Character : ISaveable
 												
 												<h4> Async File IO </h4> <p>
 													A few notes about IO and game engines should be mentioned. File operations cannot block the main thread or stop
-													gameplay if unsuccessful. In order to ensure this, we made our FileManger class operate using async/await methods. This 
-													allowed us to run the IO without stopping execution and passing a Cancellation Token in case it hangs so we can cancel the operation 
-													after a timeout is reached. </p>
-<pre><code>
-FileManager.cs
+													gameplay if unsuccessful. In order to ensure this, I made our FileManger class operate using async/await methods. This 
+													allowed me to run the IO without blocking execution. Passing a Cancellation Token handles the case where our file operation is
+													unsuccessful and cancels it without breaking other parts of the game. </p>
+<pre><code> FileManager.cs
 
 public class FileManager {
 	public static async Task WriteToFile(string path, string data, CancellationToken timeout)
@@ -186,8 +185,7 @@ public static async Task&ltstring&gt LoadFromFile(string FullPath, CancellationT
 													to consider, is that in order to pass a chunk of data back to the correct object, we need a data mapping schema.
 													I decided to handle this issue by creating an ID for each Prefab during editor time. Each prefab that will 
 													need to be saved will have a SaveComponent attached to it. </p>
-<pre><code>
-SaveComponent.cs
+<pre><code> SaveComponent.cs
 
 [Serializable]
 public SaveComponent : MonoBehaviour {
@@ -220,14 +218,13 @@ public SaveComponent : MonoBehaviour {
 </code></pre>
 													<p>
 													We iterate through the prefabs in our file system using the AssetDatabase and check to see if any prefabs do not have an ID component.
-													We also need a data structure that contains all the prefabID:gameObject mappings. A ScriptableObject should work nicely,
+													We also need a data structure that contains all the {prefabID:gameObject} mappings. A ScriptableObject should work nicely,
 													lets call it PrefabRegistrySO.
 													We will need to manually add each GameObject prefab to our registry. Since we cannot serialize a Dictionary in the 
 													Unity Inspector window, we use a list of GameObjects and create our Dictionary mapping at runtime.
 													
 													</p>
-<pre><code>
-PrefabRegistrySO.cs
+<pre><code> PrefabRegistrySO.cs
 
     [CreateAssetMenu(fileName = "NewPrefabRegistry", menuName = "SaveSystem/PrefabRegistry")]
     public class PrefabRegistrySO : ScriptableObject {
@@ -270,16 +267,15 @@ PrefabRegistrySO.cs
     }
 
 </pre></code>
-													
+													<h4> Data Persistence</h4>
 													The next hurdle is to think about how to design our system to be persistent between sessions. Luckily, our Prefab ID
 													comes in handy for this issue as well. We can activate prefabs (using object pooling), based on their IDs
-													and simply pass data back to each object.
-													Now we will add a PersistentObject class to hold IDs and save data.
+													and simply pass data back to each object in the same order they were saved.
+													Now we will add a PersistentObject class to hold IDs and save data,
 													and then call Save/Load on the SaveComponents themselves rather than in the Character class. 
 													This decouples the actual saving and loading code from any specific game object or class and 
 													abstracts it into a separate component. Here we are iterating through ISaveables and calling PopulateSaveData/LoadFromSaveData on each one.
-<pre><code>
-PersistentObject.cs
+<pre><code> PersistentObject.cs
 
 [Serializable]
 public class PersistentObject {
@@ -289,12 +285,12 @@ public class PersistentObject {
 </pre></code>
 
 
-<pre><code>
-SaveComponent.cs 
+<pre><code> SaveComponent.cs 
 
 public class SaveComponent {
-	// Generate prefab ID
-	// See above example 
+	
+	// Continued from above...
+	// Code to Generate prefab ID
 	
 	private ISaveable[] _saveables;
 	
@@ -334,11 +330,11 @@ public class SaveComponent {
 													I needed to forgo Unity's JsonUtility. I decided to use NewtonSoft JsonConvert instead as it allows for
 													custom serialization and it performs TypeHandling out of the box. 
 													And here is our Json handler which will take care of converting objects to json 
-													during the save and converting strings to objects on load.
+													during the save and converting strings to objects on load
+													(In the future, I plan to implement my own type handling system, but this does the trick for now).
 												</p>
 			
-<pre><code>			
-JsonManager.cs
+<pre><code>	JsonManager.cs
 
 public class JsonHelper {
 	public static string ConvertToJson(List&ltPersistentObject&gt data) {
@@ -362,10 +358,10 @@ public class JsonHelper {
 													
 													
 												<h4> Loading </h4> <p>
-													During load, we asynchronously read our json into the ISaveData[] chunk by chunk. Firstly, we need to release (deactivate) any ISaveable objects that are 
-													currently active in the scene. Now instead of simply passing the data around, we will use object pooling here.
+													During load, we asynchronously read our json into the ISaveData[] chunk by chunk, using our FileManager. Firstly, we need to release (deactivate) any ISaveable objects that are 
+													currently active in the scene using our Object Pool. Instead of simply passing the data around, we will use object pooling to activate only what we need using Prefab IDs.
 													The idea is that we can simply take the loaded ISaveData chunk, grab the PrefabID and reference the prefab ID in our PrefabRegistry
-													to get back the prefab type that was saved. Our system activates this object and calls 
+													to get back the prefab type that was saved. The object pool has already instantiated the objects, so our system just activates the object and calls 
 													ISaveable.Load(ISaveData data) to pass back the relevant data.
 													
 													Here is the Loading process step by step: <br/>
@@ -375,8 +371,7 @@ public class JsonHelper {
 														4) Pass data back to object <br/>
 													
 													Lets see how all this works in tandem in the SaveManager class. </p>
-<pre><code>
-SaveManager.cs
+<pre><code> SaveManager.cs
 
 public class SaveManager : MonoBehaviour {
 	
@@ -490,19 +485,19 @@ public class SaveManager : MonoBehaviour {
 	}
 }
 
-</pre></code>
-													I've left some things out for brevity, mainly the object pooling details and read/write IO events triggered from the UI,
+</pre></code>										<h4> Takeaways </h4>
+													I've left some things out for brevity, mainly the object pooling details and how save/load events are triggered from the UI,
 													but you can fill in those gaps as a fun challenge. 
 													
-													
-													
-													The beauty of this design is that it abstracts the system so it can save/load from different events such as New Game, death, etc.
+													<br/>
+													The beauty of this design is that it abstracts the save system so it can save/load from different events such as New Game, death, load, etc.
 													This means any object that needs to restore or capture the game state will be able to do so by using this system. 
 													
 													Now this code is by no means perfectly optimized. I am iterating through everything in the scene and reloading it,
 													even if the saved data is no different from the current default data. A more intelligent design would be to cache only the new 
 													data and reload objects that have changed since the last save. Caching is possible with our current system and 
-													would greatly reduce loading times, especially as the size of our levels grow. Currently, I have not had the resources to implement 
+													would greatly reduce loading times, especially as the size of our levels grow. 
+													Currently, I have not had the resources to implement 
 													this optimization yet, but stay tuned in the future for any updates!
 													</p>
 											</div>
@@ -520,17 +515,18 @@ public class SaveManager : MonoBehaviour {
 												<h4>Fmod Unity Integration basics </h4>
 												<p>
 													The first step here was to understand how the FMOD Unity integration needs to be set up.
-													Firstly, the main camera needs to have a Studio Listner object attached. With only one camera, this is quite simple.
-													Next, we need to decide which banks need to be loaded using a Studio Bank Loader component. Now we are ready to connect our events. 
+													Firstly, the main camera always needs to have a Studio Listner object attached for 3D positioned sounds to pan correctly. 
+													Next, we need to decide which banks need to be loaded using a Studio Bank Loader component. I like to tick 
+													'Preload Sample Data' in order to reduce latency, at the cost of consuming a small amount of memory upfront. 
+													Now we are ready to connect our events. 
 													
 													At this point, it is important to note that the FMOD Unity integration works by using string references. 
-													This is true for all functions referencing events, parameters, busses, and banks. The problem with that, 
-													is that string comparisons are extremely slow and unreliable. What happens if we change the name? We need to track down a missing 
-													reference. Instead, there is an option in FMOD to export a C# file with GUIDs. The GUID won't change even if the name does.
+													This is true for all API functions that reference events, parameters, busses, and banks. The problem with that, 
+													is that string comparisons are extremely slow and unreliable. What happens if we change the name in FMOD? We need to track down a missing 
+													reference, and even worse, that name may be sprawled all over our codebase. Instead, there is an option in FMOD to export a C# file with GUIDs. The GUID won't change even if the name does.
 													On the top row of options, go to Scripts/FMOD Examples/Export GUIDS Header/C# File.
 													GUIDs is how FMOD references everything on the backend and using them directly will speed things up a bit. 
-<pre><code>
-FMODReferences.cs
+<pre><code>FMODReferences.cs
 
 using System;
 
@@ -559,16 +555,19 @@ namespace FSPRO
 }
 </code></pre>
 													<h4> AudioManager </h4>
-													After setting up a basic FMOD project with a couple standard events containing simple parameters, I assigned them to 
+													After setting up a basic FMOD project with a couple events and parameters, I assigned them to 
 													mixer busses and built them to bank files located in the Unity project Assets folder.
 													
 													I then created an empty Unity object called AudioManager and started organizing this system.
-													Firstly, I split events into three general categories: Music, SFX, and Ambience.
+													Firstly, I split events into three general categories: Music, Sound Effects (SFX), and Ambience.
 													
-													This allowed me to segrate the system based on the type of audio and context of when it should be playing.
+													This allowed me to compartmentalize the system based on the type of audio and context of when it should be playing.
+													Music is always a 2D, singular object, and parameters such as health or experience could affect the composition.
+													Sound effects are generally positional one-shot sounds trigger by a collision or particular interaction, and many can overlap at once.
+													Ambience is always positional, as it establishes a sense of space in the environment.
+													
 													Here is what my audio manager script looks like:
-<pre><code>
-AudioManager.cs 
+<pre><code> AudioManager.cs 
 
 public class AudioManager {
 	public EventInstance EventInstance;
@@ -627,22 +626,26 @@ public class AudioManager {
 		return vol;
 	}
 }
-</code></pre>												
+</code></pre>										<h4> FMOD Optimizations </h4>		
 													Lets break down a little bit of what's going on here. 
 													
 													Now I am able to play sound from anywhere in the project without duplicating code. This also allow non audio programmers
-													to use the code without needing to understand the backend. They just need to include an AudioManager object in their class. 
+													to use the code without needing to understand the backend. They just need to include an AudioManager object in their class and they
+													have access to my helper functions, without needing to understand the FMOD source.
 													
-													Another interesting fact, is that we have the ability to reference parameters by name(string), which is very slow,
-													or by ID which is only a single integer comparison rather than a bunch of character comparisons.													
+													Another interesting fact, is that we have the ability to reference parameters by name(string), which is very slow and error prone,
+													or by ID which is only a single integer comparison. 
 													
 													
+													<h4> FMOD PlayOneShot Function Override </h4>
 													SFX, for the most part, were attached to Character objects and needed to be 3D. The footsteps audio, for instance,
-													needed to be attached to the Character feet (this is a third-person game), so the sound is coming from under
+													needed to be attached to the Character shoes (this is a third-person game), so the sound is coming from under
 													the camera. The function we want to call in this case is RuntimeManager.PlayOneShotAttached which fires off a
-													single instance sound and allows you to pass in a GameObject. The native function does not allow you to pass in a parameter for the event. 
+													single instance sound and allows you to pass in a GameObject. The native function does not allow you to pass in a parameter for the event.
+													Since I wanted to update the footsteps using the floor material as a parameter, I needed to find a way to do this.
 													Luckily, we have access to the FMOD source code and can easily override the PlayOneShotAttached to include this.
-<pre><code>
+<pre><code>RuntimeManager.cs 
+
 public static void PlayOneShotAttached(Guid guid, GameObject gameObject, string parameterName, float parameterValue)
 {
 	var instance = CreateInstance(guid);
@@ -654,10 +657,9 @@ public static void PlayOneShotAttached(Guid guid, GameObject gameObject, string 
 
 </code></pre>																							
 													
-													Then, using TerrainData and SplatMaps, I was able to get the floor material type (wood/sand/grass)
+													Then, using TerrainData and SplatMaps, I was able to get the floor material type 
 													and play the relevant Multi-Instrument samples depending on which index value is returned, using FMOD parameters.
-<pre><code>
-TerrainDetector.cs
+<pre><code> TerrainDetector.cs
 
 public class TerrainDetector : MonoBehaviour {
 
@@ -706,8 +708,7 @@ public class TerrainDetector : MonoBehaviour {
 </pre></code>
 												<p> Then, I attached the PlayOneFootstep() function below to the animation event 
 												where the character's foot hits the ground for walking, running, etc. </p>
-<pre><code>
-Footsteps.cs
+<pre><code> Footsteps.cs
 
 public class Footsteps : MonoBehaviour {
 	[SerializeField] private GameObject shoes;
@@ -752,8 +753,7 @@ public class Footsteps : MonoBehaviour {
 													I needed to refer to was the "GamePaused" parameter that added a bandpass filter onto the current music playing
 													while the game was paused. I wanted each music event to share this parameter to avoid duplicating behaviour.
 													After some research, here is the background music script I came up with: 
-<pre><code>
-BackgroundMusic.cs
+<pre><code> BackgroundMusic.cs
 
 public class BackgroundMusic : MonoBehaviour {
 	private AudioManager _audioManager = new AudioManager();

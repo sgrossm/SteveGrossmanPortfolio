@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title> Game Audio! </title>
+		<title> Audio </title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -56,9 +56,9 @@
 													This project was a great learning experience, from a technical audio perspective, as well as 
 													a creative and musical perspective. I created a series of videos to document the process 
 													and illustrate some common design patterns relevant to C++ and the JUCE framework. 
-													You can view the video series on my Youtube </p>
-													<iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL2AmdOyMau7Dce46vOBTbhmpErQ_tEFlv" title="YouTube video player" frameborder="0" 
-													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+													You can view the video series on my Youtube channel:</p>
+													<div class="iframeStyle"><iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PL2AmdOyMau7Dce46vOBTbhmpErQ_tEFlv" title="YouTube video player" frameborder="0" 
+													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 													
 													
 													<br/><br/><h4>Composition Challege </h4>
@@ -67,8 +67,8 @@
 													and used this concept as guidance for my musical choices. This was an extremely valuable 
 													experience for me, and forced me to be creative given the constraints. You can check out each 
 													composition and walkthrough in the video playlist below:</p>
-													<iframe width="560" height="315" src="https://www.youtube.com/embed/videseries?list=PL2AmdOyMau7Acu-06Qeeg3o0RDZE5oeGZ" title="YouTube video player" frameborder="0" 
-													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+													<div class="iframeStyle"><iframe width="560" height="315" src="https://www.youtube.com/embed/videseries?list=PL2AmdOyMau7Acu-06Qeeg3o0RDZE5oeGZ" title="YouTube video player" frameborder="0" 
+													allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 													
 													
 
@@ -85,22 +85,20 @@
 											<div>
 												<h4>Unity Integration</h4>
 												<p> 
-													In the past I've used Wwise for audio integration and got a certification from their awesome online
-													<u><a href="https://www.audiokinetic.com/learn/certifications/"> training courses </a></u>.
+													In the past I've used Wwise for audio integration. I reccomend their awesome online
+													<u><a href="https://www.audiokinetic.com/learn/certifications/"> training courses </a></u> and even got a certification myself.
 													For this project, I decided to delve into FMOD.  
 													All music and sound effects were created, mixed, and implemented by me using FL Studio, FMOD and Unity.
 													I used the <u><a href="https://learn.unity.com/project/3d-game-kit-lite">3D Gamekit Lite Unity project </a> </u> 
-													for simple level design and gameplay. 
-													
-																									Here is a video showing the final product.<br/><br/>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/3yfeIKmOirs" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> 
+													for simple level design and gameplay. Here is a video showing the final product.<br/>
+<div class="iframeStyle"><iframe width="560" height="315" src="https://www.youtube.com/embed/3yfeIKmOirs" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 															
 													<br/>
 													The first step was to strip all the Unity audio out of the project and start hooking up events I created in FMOD.
 													
 													Coming from a traditional music composition background, interactive music provided an interesting challenge for me.
-													FMOD contains different "instrument" types in order to trigger sound in a dynamic way.
+													FMOD contains different "instrument" types in order to trigger sound in a dynamic and interactive context.
 													The most common types are single and multi instruments. Single instruments are just single audio clips.
 													Multi instruments allow for multiple audio files to be selected based on some prioritization or randomly each time an event
 													triggers. This adds variety and immersion to the game world. 
@@ -109,7 +107,9 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 													and can play as a 2D timeline event. 
 													
 													Music should change based on context: if the player engages in combat, enters a new area, or pauses the game,
-													the music should transition to a new state.
+													the music should transition to a new state. You can further increase the variability of your compositions by
+													using destination markers and and looping regions. This way, the music plays in a different order every time avoids monotony.
+
 													
 													In order to change the background music when releveant, I created trigger zones in Unity and attached 
 													Studio Parameter Trigger to them. When the player enters those areas, this component updates the FMOD parameter
@@ -121,7 +121,7 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 													<img  src="images/GameAudio/Quantization.PNG" style="display:block;width:80%;"/>
 													
 													Certain transitions, such as combat, should be more immediate.
-													Within each of these songs, I created loop regions with destination markers set to percentages. This indicates
+													Within each of these songs, I created loop regions with destination markers set with probability percentages. This indicates
 													that some percentage of the time the song will transition to the destination, and other times it will loop. 
 													<img src="images/GameAudio/MusicFMOD.PNG" style="display:block;width:100%;"/>
 													
@@ -130,7 +130,7 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 													<img src="images/GameAudio/GamePaused.PNG" style="display:block;width:80%;"/>
 													
 													Ambient sound, such as wind, bubbling acid, and city chatter definitely needed 3D directional data. These
-													are fairly easy to set up without code and only trigger when the player is within a certain distance of the emmiter object. 
+													are fairly easy to set up using the FMOD unity integration, and only become audible when the player is within a certain distance of the emmiter object. 
 												
 													SFX are mainly triggered on a OneShot basis (fire-and-forget) and need to be positioned in such a way that the sound 
 													is coming from the right location. For example, if the player swings their staff, the event needs to be passed along 
@@ -145,8 +145,8 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 												<h4> Mixer </h4>
 												<p>
 													Finally, events can be routed into mixer groups in order to apply batch processing to similar events.
-													These mixers allow you to control volume and other effects, one of the most logical uses being that you 
-													can route them into your option menu in order to allow players to set volumes for music and SFX, as well as
+													These mixers allow you to control volume and other effects. One of the most logical uses is to 
+													route them into your game's option menu in order to allow players to set volumes for music and SFX, as well as
 													a global volume that will reference the master bus. One of the interesting things I was able to do as well 
 													is to use a sidechain compressor in order to duck the volume of the music when important SFX triggered. Sidechaining 
 													allowed me to compress (lower the volume of) the music based on the input of an external signal. 
@@ -154,16 +154,17 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 
 												</p>
 												
-												
 													
 												<h4> Max instances, Priority, Optimization, and Profiling </h4>
 												<p>
 													After getting sound to play in the game we can monitor and tweak certain settings to improve performance and remove
 													any unnecessary burdens from the CPU. One of the best ways to determine if there are any spikes during processing is to 
-													use the FMOD profiler and connect it to your game using Live Update. Then you can record a session and look for any spikes.
+													use the FMOD profiler and connect it to your game using Live Update. Then you can record a session and look for any spikes
+													or unusual activity. You have the choice of playing back the profiler session using the recorded waveform or recorded API calls.
+													You also can save or export these sessions for more detailed investigation.
 													<img src="images/GameAudio/Profiler.PNG" style="display:block;width:80%;"/>
 
-													Some other areas we can look at are located in the Event Macros Drawer. This view provides options for how events are created,
+													A very important area to consider is located in the Event Macros Drawer. This view provides options for how events are created,
 													how many instances of an event can exist concurrently, and how they behave if they go over the max instance count.
 													
 													The most important of these options are the number of Max Instances, Stealing Mode, and Priority. 
@@ -186,21 +187,21 @@ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; pic
 										<article>											
 											<div >
 												<h4> Sound effects </h4>
-												<p> In this first video, I outline my process for sound design, as it pertains to creating game sound effects,
-												covering synthesis, sampling, layering, and processing. </p>
+												<p> In this first video, I outline my process for sound design, as it pertains to creating game sound effects.
+												I cover topics such as synthesis, sampling, layering, and processing. </p>
 															 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/01pC1XcAsFU" frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="iframeStyle"><iframe width="560" height="315" src="https://www.youtube.com/embed/01pC1XcAsFU" frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 																						
 																					
 
 												<br/><br/><h4> Mixing and Mastering </h4>
 												<p>
-												Next, I delve into the techniques used for mixing and mastering the interactive music 
+												Next, I delve into the techniques used for arranging, mixing, and mastering the interactive music 
 												stems I composed for the Unity demo above.
 												</p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/PYSyDab8Esg" frameborder="0"
- allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div class="iframeStyle"><iframe width="560" height="315" src="https://www.youtube.com/embed/PYSyDab8Esg" frameborder="0"
+ allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 											
 											
 											</div>
