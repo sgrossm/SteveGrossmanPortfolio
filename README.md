@@ -1,1 +1,1 @@
-[Steve Grossman Portfolio link] (https://www.stevegrossman.me)
+Steve Grossman Portfolio link -> (https://www.stevegrossman.me)
