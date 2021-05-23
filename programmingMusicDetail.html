@@ -291,12 +291,12 @@ public class BackgroundMusic : MonoBehaviour {
 	private void Start()
 	{
 		_audioManager.CreateAndStartEvent(FmodEventGuids.Events_Music_ExploreIsland);
-
+		// Cache global parameter
+		_musicParameterID = _audioManager.GetParameterID(FmodParameters.GlobalParameter_Music_GamePaused);
 	}
 
 	private void Update()
 	{
-		_musicParameterID = _audioManager.GetParameterID(FmodParameters.GlobalParameter_Music_GamePaused);
 		RuntimeManager.StudioSystem.setParameterByID(_musicParameterID, Convert.ToInt32(GameManager.Instance.GameIsPaused));
 	}
 
